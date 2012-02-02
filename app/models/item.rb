@@ -42,7 +42,7 @@ class Item < ActiveRecord::Base
   def value_finder(triples)
     lambda do |element, qualifier, multiple_values = nil|
       values = triples.select {|t| t.element == element and t.qualifier == qualifier}.collect {|t| t.value}
-      return multiple_values ?  values : values.first
+      return multiple_values ?  values : (values.first || '')
     end
   end
 end
