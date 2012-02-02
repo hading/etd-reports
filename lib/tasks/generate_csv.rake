@@ -10,13 +10,17 @@ namespace :etd do
     end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
     submissions = VireoSubmission.where(:submission_date => start_date..(end_date + 1.day)).all
     csv = CSV.generate do |csv|
-      
+      csv << ['UIN', 'Student Name', 'Degree Type', 'Degree Name',
+              'Degree Department', 'Embargo Option', 'Title',
+              'Deposit Date', 'Degree Date', 'Advisor Name',
+              'Committee Chair', 'Committee', 'Research Director']
       submissions.each do |s|
         data = s.item.export_data_hash
+        #TODO still need to map depending on degree type Thesis vs. Dissertation
         csv << [data[:uin], data[:student_name], data[:degree_type], data[:degree_name],
                 data[:degree_department], data[:embargo_option], data[:title],
                 data[:deposit_date], data[:degree_date], data[:advisor_name],
-                data[:committee_chair], data[:committee].join('; ')]
+                data[:committee_chair], data[:committee].join('; '), '']
       end
     end
     puts csv
