@@ -40,9 +40,9 @@ class Item < ActiveRecord::Base
   #return a lambda. Calling with just element and qualifier returns the first match.
   #Calling with anything in the third argument position returns an array with all matches
   def value_finder(triples)
-    lambda do |element, qualifier, *multiple_values|
+    lambda do |element, qualifier, multiple_values = nil|
       values = triples.select {|t| t.element == element and t.qualifier == qualifier}.collect {|t| t.value}
-      return multiple_values.length == 0 ? values.first : values
+      return multiple_values ?  values : values.first
     end
   end
 end
