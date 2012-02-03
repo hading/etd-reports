@@ -1,2 +1,6 @@
-Use this README file to introduce your application and point to useful places in the API for learning more.
-Run "rake doc:app" to generate API documentation for your models, controllers, helpers, and libraries.
+This project is intended (for now) primarily to be able to use the
+ActiveRecord ORM to wrap parts of our etd/vireo database in order to
+do batch type processing. There's not actually any plan to put a real
+Rails app up - it's just more convenient to start with it to have all
+the machinery in place so we can just define models, rake tasks,
+etc. as needed to accomplish what batch processing we want.
