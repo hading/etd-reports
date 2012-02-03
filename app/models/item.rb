@@ -5,6 +5,8 @@ class Item < ActiveRecord::Base
   has_one :vireo_submission
   has_many :metadata_values
 
+  delegate :is_doctoral?, :to => :vireo_submission
+
   def metadata_triples
     self.metadata_values.collect do |value|
       MetadataTriple.new.tap do |triple|
@@ -29,10 +31,26 @@ class Item < ActiveRecord::Base
       h[:title] = finder.call('title')
       h[:deposit_date] = submission.submission_date.strftime('%F')
       h[:degree_date] = finder.call('date', 'submitted')
-      h[:advisor_name] = finder.call('contributor', 'advisor')
-      h[:committee_chair] = finder.call('contributor', 'committeeChair')
-      h[:committee] = finder.call('contributor', 'committeeMember', true)
+      if self.is_doctoral?
+        add_doctoral_committee_fields(h, finder)
+      else
+        add_masters_committee_fields(h, finder)
+      end
     end
+  end
+
+  def add_doctoral_committee_fields(h, finder)
+    h[:advisor_name] = []
+    h[:committee_chair] = finder.call('contributor', 'committeeChair', true)
+    h[:committee] = finder.call('contributor', 'committeeMember', true)
+    h[:research_director] = finder.call('contributor', 'advisor', true)
+  end
+
+  def add_masters_committee_fields(h, finder)
+    h[:advisor_name] = finder.call('contributor', 'advisor', true)
+    h[:committee_chair] = finder.call('contributor', 'committeeChair', true)
+    h[:committee] = []
+    h[:research_director] = []
   end
 
   protected
@@ -41,8 +59,8 @@ class Item < ActiveRecord::Base
   #Calling with anything in the third argument position returns an array with all matches
   def value_finder(triples)
     lambda do |element, qualifier = nil, multiple_values = nil|
-      values = triples.select {|t| t.element == element and t.qualifier == qualifier}.collect {|t| t.value}
-      return multiple_values ?  values : (values.first || '')
+      values = triples.select { |t| t.element == element and t.qualifier == qualifier }.collect { |t| t.value }
+      return multiple_values ? values : (values.first || '')
     end
   end
 end

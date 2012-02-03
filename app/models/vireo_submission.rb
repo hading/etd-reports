@@ -4,4 +4,8 @@ class VireoSubmission < ActiveRecord::Base
 
   belongs_to :item
 
+  def is_doctoral?
+    self.degree_type == 'Dissertation'
+  end
+
 end

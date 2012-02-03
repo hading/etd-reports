@@ -12,15 +12,15 @@ namespace :etd do
     csv = CSV.generate do |csv|
       csv << ['UIN', 'Student Name', 'Degree Type', 'Degree Name',
               'Degree Department', 'Embargo Option', 'Title',
-              'Deposit Date', 'Degree Date', 'Advisor Name',
-              'Committee Chair', 'Committee', 'Research Director']
+              'Deposit Date', 'Degree Date', 'Committee Chair',
+              'Advisor Name', 'Committee Members', 'Research Director']
       submissions.each do |s|
         data = s.item.export_data_hash
         #TODO still need to map depending on degree type Thesis vs. Dissertation
         csv << [data[:uin], data[:student_name], data[:degree_type], data[:degree_name],
                 data[:degree_department], data[:embargo_option], data[:title],
-                data[:deposit_date], data[:degree_date], data[:advisor_name],
-                data[:committee_chair], data[:committee].join('; '), '']
+                data[:deposit_date], data[:degree_date], data[:committee_chair].join('; '),
+                data[:advisor_name].join('; '), data[:committee].join('; '), data[:research_director].join('; ')]
       end
     end
     puts csv
