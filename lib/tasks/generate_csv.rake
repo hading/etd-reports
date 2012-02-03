@@ -16,7 +16,6 @@ namespace :etd do
               'Advisor Name', 'Committee Members', 'Research Director']
       submissions.each do |s|
         data = s.item.export_data_hash
-        #TODO still need to map depending on degree type Thesis vs. Dissertation
         csv << [data[:uin], data[:student_name], data[:degree_type], data[:degree_name],
                 data[:degree_department], data[:embargo_option], data[:title],
                 data[:deposit_date], data[:degree_date], data[:committee_chair].join('; '),
