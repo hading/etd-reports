@@ -31,6 +31,11 @@ class Item < ActiveRecord::Base
       h[:title] = finder.call('title')
       h[:deposit_date] = submission.submission_date.strftime('%F')
       h[:degree_date] = finder.call('date', 'submitted')
+      h[:degree_month], h[:degree_year] = h[:degree_date].split
+      h[:program] = finder.call('degree', 'program')
+      h[:program_code] = finder.call('degree', 'programCode')
+      h[:discipline_code] = finder.call('degree', 'disciplineCode')
+      h[:department_code] = finder.call('degree', 'departmentCode')
       if self.is_doctoral?
         add_doctoral_committee_fields(h, finder)
       else
@@ -42,14 +47,14 @@ class Item < ActiveRecord::Base
   def add_doctoral_committee_fields(h, finder)
     h[:advisor_name] = []
     h[:committee_chair] = finder.call('contributor', 'committeeChair', true)
-    h[:committee] = finder.call('contributor', 'committeeMember', true)
+    h[:committee_members] = finder.call('contributor', 'committeeMember', true)
     h[:research_director] = finder.call('contributor', 'advisor', true)
   end
 
   def add_masters_committee_fields(h, finder)
     h[:advisor_name] = finder.call('contributor', 'advisor', true)
     h[:committee_chair] = finder.call('contributor', 'committeeChair', true)
-    h[:committee] = []
+    h[:committee_members] = []
     h[:research_director] = []
   end
 
