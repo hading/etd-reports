@@ -6,6 +6,7 @@ gem 'rails', '3.2.6'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'pg'
+gem 'rb-readline'
 
 #wrapping legacy tables that may have composite primary keys
 #don't know if we need this yet

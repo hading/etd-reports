@@ -30,7 +30,7 @@ set :deploy_via, :remote_cache
 #directories on the server to deploy the application
 #the running instance gets links to [deploy_to]/current
 set :home, "/services/ideals-etd"
-set :deploy_to, "#{home}/etd-reports"
+set :deploy_to, "#{home}/etd-reports-cap"
 set :shared_config, "#{shared_path}/config"
 set :public, "#{current_path}/public"
 
@@ -76,7 +76,7 @@ namespace :deploy do
     local_cache_dir = "/home/hading/cache/etd-reports"
     rsync("#{home}/.rvm/", "#{local_cache_dir}/ruby/")
     rsync("#{shared_path}/bundle/", "#{local_cache_dir}/bundle/")
-    rsync("#{home}/.passenger/", "#{local_cache_dir}/passenger/")
+#    rsync("#{home}/.passenger/", "#{local_cache_dir}/passenger/")
   end
 
   def rsync(remote, local)
@@ -91,5 +91,5 @@ end
 after 'deploy:setup', 'deploy:create_shared_dirs'
 
 after 'deploy:create_symlink', 'deploy:link_config'
-after 'deploy:create_symlink', 'deploy:symlink_shared_dirs'
+
 
