@@ -3,7 +3,7 @@ require 'date'
 
 class TooManyEntries < RuntimeError
   attr_accessor :field, :quantity
-  def init(args = {})
+  def initialize(args = {})
     self.field = args[:field]
     self.quantity = args[:quantity]
   end
