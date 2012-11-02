@@ -14,19 +14,47 @@ namespace :etd do
                'Program', 'Program Code', 'Discipline Code',
                'Embargo Option', 'Title',
                'Deposit Date', 'Degree Month', 'Degree Year',
-               'Committee Chair', 'Advisor Name',
-               'Committee Members', 'Research Director']
+               'Chair', 'Advisor',
+               'CommitteeMbr', 'DirectorResearch']
+    header_quantity_map = {'Chair' => 2, 'Advisor' => 2, 'DirectorResearch' => 2, 'CommitteeMbr' => 8}
     csv = CSV.generate do |csv|
-      csv << headers
+      csv << generate_headers(headers, header_quantity_map)
       submissions.each do |s|
         data = s.item.export_data_hash
         csv << headers.collect do |header|
           field = header.downcase.gsub(' ', '_').to_sym
           value = data[field]
-          value.is_a?(Array) ? value.join('; ') : value
-        end
+          if quantity = header_quantity_map[header]
+            #here value will always be an array
+            #Error if there are too many values
+            #Add blanks if there are not enough values
+            raise RuntimeError("Too many entries for #{header}.") if value.length > quantity
+            if value.length < quantity
+              (quantity - value.length).times do
+                value << ""
+              end
+            end
+            value
+          else
+            value.is_a?(Array) ? value.join('; ') : value
+          end
+        end.flatten
       end
     end
     puts csv
+  end
+end
+
+def generate_headers(headers, quantity_map)
+  Array.new.tap do |header_array|
+    headers.each do |header|
+      if quantity = quantity_map[header]
+        (1..quantity).each do |index|
+          header_array << "#{header}#{index}"
+        end
+      else
+        header_array << header
+      end
+    end
   end
 end

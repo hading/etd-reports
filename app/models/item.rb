@@ -45,17 +45,17 @@ class Item < ActiveRecord::Base
   end
 
   def add_doctoral_committee_fields(h, finder)
-    h[:advisor_name] = []
-    h[:committee_chair] = finder.call('contributor', 'committeeChair', true)
-    h[:committee_members] = finder.call('contributor', 'committeeMember', true)
-    h[:research_director] = finder.call('contributor', 'advisor', true)
+    h[:advisor] = []
+    h[:chair] = finder.call('contributor', 'committeeChair', true)
+    h[:committeembr] = finder.call('contributor', 'committeeMember', true)
+    h[:directorresearch] = finder.call('contributor', 'advisor', true)
   end
 
   def add_masters_committee_fields(h, finder)
-    h[:advisor_name] = finder.call('contributor', 'advisor', true)
-    h[:committee_chair] = finder.call('contributor', 'committeeChair', true)
-    h[:committee_members] = []
-    h[:research_director] = []
+    h[:advisor] = finder.call('contributor', 'advisor', true)
+    h[:chair] = finder.call('contributor', 'committeeChair', true)
+    h[:committeembr] = []
+    h[:directorresearch] = []
   end
 
   protected
