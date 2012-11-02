@@ -2,6 +2,7 @@ require 'csv'
 require 'date'
 
 class TooManyEntries < RuntimeError
+  attr_accessor :field, :quantity
 end
 
 namespace :etd do
@@ -32,7 +33,7 @@ namespace :etd do
               #here value will always be an array
               #Error if there are too many values
               #Add blanks if there are not enough values
-              raise TooManyEntries.new("Too many entries for #{header}.") if value.length > quantity
+              raise TooManyEntries.new(:field => header, :quantity => value.length) if value.length > quantity
               if value.length < quantity
                 (quantity - value.length).times do
                   value << ""
@@ -46,8 +47,8 @@ namespace :etd do
         end
       end
       puts csv
-    rescue TooManyEntries
-      puts "Some field had too many entries. Please consult the programming group."
+    rescue TooManyEntries => e
+      puts "#{e.field} had #{e.quantity} entries, which exceeds the programmed limit. Please contact the Vireo programming group."
     end
   end
 end
