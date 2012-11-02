@@ -25,7 +25,7 @@ namespace :etd do
                  'Deposit Date', 'Degree Month', 'Degree Year',
                  'Chair', 'Advisor',
                  'CommitteeMbr', 'DirectorResearch']
-      header_quantity_map = {'Chair' => 2, 'Advisor' => 2, 'DirectorResearch' => 3, 'CommitteeMbr' => 8}
+      header_quantity_map = {'Chair' => 5, 'Advisor' => 4, 'DirectorResearch' => 4, 'CommitteeMbr' => 10}
       csv = CSV.generate do |csv|
         csv << generate_headers(headers, header_quantity_map)
         submissions.each do |s|
