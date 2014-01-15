@@ -30,11 +30,13 @@ namespace :etd do
     end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
     csv = generate_csv(start_date, end_date)
     begin
-      f = Tempfile.new('etd-report')
+      filename = "#{start_date}.csv"
+      f = File.open(filename, 'w')
       f.puts csv
-      system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{f.path}; rename #{File.basename(f)} #{start_date}.csv'")
+      f.close
+      system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{filename}'")
     ensure
-      f.close!
+      f.unlink
     end
   end
 
