@@ -32,7 +32,7 @@ namespace :etd do
     begin
       f = Tempfile.new('etd-report')
       f.puts csv
-      system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{f.path}; rename #{f.basename} #{start_date}.csv'")
+      system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{f.path}; rename #{File.basename(f)} #{start_date}.csv'")
     ensure
       f.close!
     end
