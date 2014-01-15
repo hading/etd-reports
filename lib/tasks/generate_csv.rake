@@ -37,11 +37,12 @@ namespace :etd do
       f.close!
     end
   end
-end
 
-def ensure_dates
-  ENV['RAILS_ETD_CSV_START_DATE'] ||= (Date.today- 1.day).to_s
-  ENV['RAILS_ETD_CSV_END_DATE'] ||= (Date.today- 1.day).to_s
+  task :ensure_dates do
+    ENV['RAILS_ETD_CSV_START_DATE'] ||= (Date.today- 1.day).to_s
+    ENV['RAILS_ETD_CSV_END_DATE'] ||= (Date.today- 1.day).to_s
+  end
+
 end
 
 def generate_csv(start_date, end_date)
