@@ -36,7 +36,7 @@ namespace :etd do
       f.close
       system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{filename}'")
     ensure
-      f.unlink
+      File.unlink(f)
     end
   end
 
