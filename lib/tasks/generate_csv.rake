@@ -37,10 +37,10 @@ namespace :etd do
 
   desc 'generate csv report and upload to grad college share'
   task :make_and_upload_csv => [:environment, :ensure_dates] do
-    start_date = Date.parse(ENV['RAILS_ETD_CSV_START_DATE'])
-    end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
-    submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
-    filename = "#{start_date}.csv"
+    end_date = Date.today
+    start_date = end_date - 120.days
+    submissions = VireoSubmission.having_applicant.where(:approval_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
+    filename = "ideals.csv"
     begin
       generate_csv(submissions, filename)
       system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{filename}'")
@@ -69,9 +69,9 @@ def generate_csv(submissions, filename = nil)
 end
 
 def generate_csv_internal(csv, submissions)
-  headers = ['UIN', 'Student Name', 'First Name', 'Last Name',
+  headers = ['UIN', 'First Name', 'Last Name', 'Middle Name',
              'Degree Level', 'Degree Name', 'Degree Department', 'Department Code',
-             'Program', 'Program Code', 'Discipline Code',
+             'Program', 'Program Code', 'Major Name',
              'Embargo Option', 'Title',
              'Deposit Date', 'Degree Month', 'Degree Year',
              'Chair', 'Advisor',

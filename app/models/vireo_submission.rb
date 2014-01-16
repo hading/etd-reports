@@ -10,6 +10,10 @@ class VireoSubmission < ActiveRecord::Base
     where('applicant_id is not null')
   end
 
+  def self.reportable
+    having_applicant.where('approval_date is not null')
+  end
+
   def is_doctoral?
     self.degree_type == 'Dissertation'
   end
