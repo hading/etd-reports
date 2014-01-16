@@ -50,7 +50,7 @@ namespace :etd do
   end
 
   desc 'generate csv report of entire database and upload to grad college share'
-  task :make_and_upload_csv => [:environment, :ensure_dates] do
+  task :make_and_upload_all_csv => [:environment, :ensure_dates] do
     end_date = Date.today
     start_date = end_date - 120.days
     submissions = VireoSubmission.reportable.includes(:applicant).includes(:item => :metadata_values)
