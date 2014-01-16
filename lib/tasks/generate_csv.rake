@@ -17,18 +17,32 @@ namespace :etd do
     begin
       start_date = Date.parse(ENV['RAILS_ETD_CSV_START_DATE'])
       end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
-      csv = generate_csv(start_date, end_date)
+      submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).all
+      csv = generate_csv(submissions)
       puts csv
     rescue TooManyEntries => e
       puts "#{e.field} had #{e.quantity} entries, which exceeds the programmed limit. Please contact the Vireo programming group."
     end
   end
 
+  desc 'output csv for entire database'
+  task :output_all_csv => [:environment] do
+    begin
+      submissions = VireoSubmission.having_applicant.all
+      csv = generate_csv(submissions)
+      puts csv
+    rescue TooManyEntries => e
+      puts "#{e.field} had #{e.quantity} entries, which exceeds the programmed limit. Please contact the Vireo programming group."
+    end
+
+  end
+
   desc 'generate csv report and upload to grad college share'
   task :make_and_upload_csv => [:environment, :ensure_dates] do
     start_date = Date.parse(ENV['RAILS_ETD_CSV_START_DATE'])
     end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
-    csv = generate_csv(start_date, end_date)
+    submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).all
+    csv = generate_csv(submissions)
     begin
       filename = "#{start_date}.csv"
       f = File.open(filename, 'w')
@@ -47,8 +61,7 @@ namespace :etd do
 
 end
 
-def generate_csv(start_date, end_date)
-  submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).all
+def generate_csv(submissions)
   headers = ['UIN', 'Student Name', 'First Name', 'Last Name',
              'Degree Level', 'Degree Name', 'Degree Department', 'Department Code',
              'Program', 'Program Code', 'Discipline Code',
