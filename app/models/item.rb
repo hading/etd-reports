@@ -29,7 +29,7 @@ class Item < ActiveRecord::Base
       h[:degree_level] = finder.call('degree', 'level')
       h[:degree_name] = finder.call('degree', 'name')
       h[:degree_department] = finder.call('degree', 'department')
-      h[:embargo_option] = submission.embargo_description || ""
+      h[:embargo_option] = submission.canonical_embargo_description
       h[:title] = finder.call('title')
       h[:deposit_date] = submission.submission_date.strftime('%F') || ""
       h[:degree_date] = finder.call('date', 'submitted')

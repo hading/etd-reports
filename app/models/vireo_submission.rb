@@ -22,4 +22,18 @@ class VireoSubmission < ActiveRecord::Base
     self.applicant.lastname
   end
 
+  def canonical_embargo_description
+    case self.embargo_description
+      when nil, "Open Access (OA) immediately."
+        "Open"
+      when "U of Illinois only (OA after 2 yrs)"
+        "Campus"
+      when "Closed Access (OA after 2 yrs)"
+        "Close"
+      else
+        raise RuntimeError("Unexpected embargo type!")
+    end
+  end
+
 end
+
