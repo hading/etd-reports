@@ -48,7 +48,7 @@ namespace :etd do
 end
 
 def generate_csv(start_date, end_date)
-  submissions = VireoSubmission.where(:submission_date => start_date..(end_date + 1.day)).all
+  submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).all
   headers = ['UIN', 'Student Name', 'First Name', 'Last Name',
              'Degree Level', 'Degree Name', 'Degree Department', 'Department Code',
              'Program', 'Program Code', 'Discipline Code',
