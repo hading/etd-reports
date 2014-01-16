@@ -1,4 +1,4 @@
-require 'fastercsv'
+require 'csv'
 require 'date'
 require 'tempfile'
 
@@ -73,11 +73,11 @@ end
 
 def generate_csv(submissions, filename = nil)
   if filename
-    FCSV.open(filename, "wb", :encoding => 'u') do |csv|
+    CSV.open(filename, "wb", :encoding => 'u') do |csv|
       generate_csv_internal(csv, submissions)
     end
   else
-    FCSV(:encoding => 'u') do |csv|
+    CSV(:encoding => 'u') do |csv|
       generate_csv_internal(csv, submissions)
     end
   end
