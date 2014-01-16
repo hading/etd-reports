@@ -35,7 +35,7 @@ namespace :etd do
 
   end
 
-  desc 'generate csv report and upload to grad college share'
+  desc 'generate csv report for last 120 days of approvals and upload to grad college share'
   task :make_and_upload_csv => [:environment, :ensure_dates] do
     end_date = Date.today
     start_date = end_date - 120.days
@@ -48,6 +48,21 @@ namespace :etd do
       File.unlink(filename) if File.exists?(filename)
     end
   end
+
+  desc 'generate csv report of entire database and upload to grad college share'
+  task :make_and_upload_csv => [:environment, :ensure_dates] do
+    end_date = Date.today
+    start_date = end_date - 120.days
+    submissions = VireoSubmission.reportable.includes(:applicant).includes(:item => :metadata_values)
+    filename = "all.csv"
+    begin
+      generate_csv(submissions, filename)
+      system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{filename}'")
+    ensure
+      File.unlink(filename) if File.exists?(filename)
+    end
+  end
+
 
   task :ensure_dates do
     ENV['RAILS_ETD_CSV_START_DATE'] ||= (Date.today- 1.day).to_s
