@@ -17,7 +17,7 @@ namespace :etd do
     begin
       start_date = Date.parse(ENV['RAILS_ETD_CSV_START_DATE'])
       end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
-      submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
+      submissions = VireoSubmission.reportable.where(:submission_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
       generate_csv(submissions)
     rescue TooManyEntries => e
       puts "#{e.field} had #{e.quantity} entries, which exceeds the programmed limit. Please contact the Vireo programming group."
@@ -27,7 +27,7 @@ namespace :etd do
   desc 'output csv for entire database'
   task :output_all_csv => [:environment] do
     begin
-      submissions = VireoSubmission.having_applicant.includes(:applicant).includes(:item => :metadata_values)
+      submissions = VireoSubmission.reportable.includes(:applicant).includes(:item => :metadata_values)
       generate_csv(submissions)
     rescue TooManyEntries => e
       puts "#{e.field} had #{e.quantity} entries, which exceeds the programmed limit. Please contact the Vireo programming group."
@@ -39,7 +39,7 @@ namespace :etd do
   task :make_and_upload_csv => [:environment, :ensure_dates] do
     end_date = Date.today
     start_date = end_date - 120.days
-    submissions = VireoSubmission.having_applicant.where(:approval_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
+    submissions = VireoSubmission.reportable.where(:approval_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
     filename = "ideals.csv"
     begin
       generate_csv(submissions, filename)
