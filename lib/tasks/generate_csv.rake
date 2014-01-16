@@ -17,7 +17,7 @@ namespace :etd do
     begin
       start_date = Date.parse(ENV['RAILS_ETD_CSV_START_DATE'])
       end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
-      submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).all
+      submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
       csv = generate_csv(submissions)
       puts csv
     rescue TooManyEntries => e
@@ -28,7 +28,7 @@ namespace :etd do
   desc 'output csv for entire database'
   task :output_all_csv => [:environment] do
     begin
-      submissions = VireoSubmission.having_applicant.all
+      submissions = VireoSubmission.having_applicant.includes(:applicant).includes(:item => :metadata_values)
       csv = generate_csv(submissions)
       puts csv
     rescue TooManyEntries => e
@@ -41,7 +41,7 @@ namespace :etd do
   task :make_and_upload_csv => [:environment, :ensure_dates] do
     start_date = Date.parse(ENV['RAILS_ETD_CSV_START_DATE'])
     end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
-    submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).all
+    submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
     csv = generate_csv(submissions)
     begin
       filename = "#{start_date}.csv"
@@ -72,7 +72,7 @@ def generate_csv(submissions)
   header_quantity_map = {'Chair' => 5, 'Advisor' => 4, 'DirectorResearch' => 4, 'CommitteeMbr' => 10}
   CSV.generate do |csv|
     csv << generate_headers(headers, header_quantity_map)
-    submissions.each do |s|
+    submissions.find_each(:batch_size => 100) do |s|
       data = s.item.export_data_hash
       csv << headers.collect do |header|
         field = header.downcase.gsub(' ', '_').to_sym
