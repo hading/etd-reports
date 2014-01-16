@@ -18,8 +18,7 @@ namespace :etd do
       start_date = Date.parse(ENV['RAILS_ETD_CSV_START_DATE'])
       end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
       submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
-      csv = generate_csv(submissions)
-      puts csv
+      generate_csv(submissions)
     rescue TooManyEntries => e
       puts "#{e.field} had #{e.quantity} entries, which exceeds the programmed limit. Please contact the Vireo programming group."
     end
@@ -29,8 +28,7 @@ namespace :etd do
   task :output_all_csv => [:environment] do
     begin
       submissions = VireoSubmission.having_applicant.includes(:applicant).includes(:item => :metadata_values)
-      csv = generate_csv(submissions)
-      puts csv
+      generate_csv(submissions)
     rescue TooManyEntries => e
       puts "#{e.field} had #{e.quantity} entries, which exceeds the programmed limit. Please contact the Vireo programming group."
     end
@@ -42,15 +40,12 @@ namespace :etd do
     start_date = Date.parse(ENV['RAILS_ETD_CSV_START_DATE'])
     end_date = Date.parse(ENV['RAILS_ETD_CSV_END_DATE'])
     submissions = VireoSubmission.having_applicant.where(:submission_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
-    csv = generate_csv(submissions)
+    filename = "#{start_date}.csv"
     begin
-      filename = "#{start_date}.csv"
-      f = File.open(filename, 'w')
-      f.puts csv
-      f.close
+      generate_csv(submissions, filename)
       system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{filename}'")
     ensure
-      File.unlink(f)
+      File.unlink(filename) if File.exists?(filename)
     end
   end
 
@@ -61,7 +56,19 @@ namespace :etd do
 
 end
 
-def generate_csv(submissions)
+def generate_csv(submissions, filename = nil)
+  if filename
+    CSV.open(filename, "wb") do |csv|
+      generate_csv_internal(csv, submissions)
+    end
+  else
+    CSV do |csv|
+      generate_csv_internal(csv, submissions)
+    end
+  end
+end
+
+def generate_csv_internal(csv, submissions)
   headers = ['UIN', 'Student Name', 'First Name', 'Last Name',
              'Degree Level', 'Degree Name', 'Degree Department', 'Department Code',
              'Program', 'Program Code', 'Discipline Code',
@@ -70,29 +77,27 @@ def generate_csv(submissions)
              'Chair', 'Advisor',
              'CommitteeMbr', 'DirectorResearch']
   header_quantity_map = {'Chair' => 5, 'Advisor' => 4, 'DirectorResearch' => 4, 'CommitteeMbr' => 10}
-  CSV.generate do |csv|
-    csv << generate_headers(headers, header_quantity_map)
-    submissions.find_each(:batch_size => 100) do |s|
-      data = s.item.export_data_hash
-      csv << headers.collect do |header|
-        field = header.downcase.gsub(' ', '_').to_sym
-        value = data[field]
-        if quantity = header_quantity_map[header]
-          #here value will always be an array
-          #Error if there are too many values
-          #Add blanks if there are not enough values
-          raise TooManyEntries.new(:field => header, :quantity => value.length) if value.length > quantity
-          if value.length < quantity
-            (quantity - value.length).times do
-              value << ""
-            end
+  csv << generate_headers(headers, header_quantity_map)
+  submissions.find_each(:batch_size => 100) do |s|
+    data = s.item.export_data_hash
+    csv << headers.collect do |header|
+      field = header.downcase.gsub(' ', '_').to_sym
+      value = data[field]
+      if quantity = header_quantity_map[header]
+        #here value will always be an array
+        #Error if there are too many values
+        #Add blanks if there are not enough values
+        raise TooManyEntries.new(:field => header, :quantity => value.length) if value.length > quantity
+        if value.length < quantity
+          (quantity - value.length).times do
+            value << ""
           end
-          value
-        else
-          value.is_a?(Array) ? value.join('; ') : value
         end
-      end.flatten
-    end
+        value
+      else
+        value.is_a?(Array) ? value.join('; ') : value
+      end
+    end.flatten
   end
 end
 
