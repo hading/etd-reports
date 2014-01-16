@@ -3,6 +3,7 @@ class VireoSubmission < ActiveRecord::Base
   self.primary_key = 'submission_id'
 
   belongs_to :item
+  belongs_to :applicant, :foreign_key => 'eperson_id', :class_name => 'EPerson'
 
   def is_doctoral?
     self.degree_type == 'Dissertation'

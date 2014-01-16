@@ -23,6 +23,8 @@ class Item < ActiveRecord::Base
     Hash.new.tap do |h|
       h[:uin] = submission.uin || 'unknown'
       h[:student_name] = finder.call('creator')
+      h[:first_name] = submission.applicant.firstname || ""
+      h[:last_name] = submission.applicant.lastname || ""
       h[:degree_type] = submission.degree_type || 'unknown'
       h[:degree_level] = finder.call('degree', 'level')
       h[:degree_name] = finder.call('degree', 'name')

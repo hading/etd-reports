@@ -49,8 +49,8 @@ end
 
 def generate_csv(start_date, end_date)
   submissions = VireoSubmission.where(:submission_date => start_date..(end_date + 1.day)).all
-  headers = ['UIN', 'Student Name',
-             'Degree Type', 'Degree Name', 'Degree Department', 'Department Code',
+  headers = ['UIN', 'Student Name', 'First Name', 'Last Name',
+             'Degree Level', 'Degree Name', 'Degree Department', 'Department Code',
              'Program', 'Program Code', 'Discipline Code',
              'Embargo Option', 'Title',
              'Deposit Date', 'Degree Month', 'Degree Year',
