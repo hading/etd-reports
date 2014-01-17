@@ -73,7 +73,7 @@ end
 
 def generate_csv(submissions, filename = nil)
   if filename
-    CSV.open(filename, "wb") do |csv|
+    CSV.open(filename, "wb", :encoding => 'UTF-8') do |csv|
       generate_csv_internal(csv, submissions)
     end
   else
