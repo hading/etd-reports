@@ -74,7 +74,7 @@ namespace :etd do
 end
 
 def fix_encoding(filename)
-  if ENV['RAILS_ETD_ENCODING'] and ENV['RAILS_ETD_ENCODING'].match(/^[-:.A-Z0-9]+$/)
+  if ENV['RAILS_ETD_ENCODING'] and ENV['RAILS_ETD_ENCODING'].match(/^[-:_.A-Z0-9]+$/)
     system("iconv -f UTF-8 -t #{ENV['RAILS_ETD_ENCODING']} #{filename} > temp.csv")
     system("mv -f temp.csv #{filename}")
   end
