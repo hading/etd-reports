@@ -43,7 +43,6 @@ namespace :etd do
     filename = "ideals.csv"
     begin
       generate_csv(submissions, filename)
-      fix_encoding(filename)
       system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{filename}'")
     ensure
       File.unlink(filename) if File.exists?(filename)
@@ -58,7 +57,6 @@ namespace :etd do
     filename = "all.csv"
     begin
       generate_csv(submissions, filename)
-      fix_encoding(filename)
       system("smbclient //gradfps2.ad.uillinois.edu/etd --authentication-file /services/ideals-etd/etc/smb-credentials -c 'put #{filename}'")
     ensure
       File.unlink(filename) if File.exists?(filename)
@@ -71,13 +69,6 @@ namespace :etd do
     ENV['RAILS_ETD_CSV_END_DATE'] ||= (Date.today- 1.day).to_s
   end
 
-end
-
-def fix_encoding(filename)
-  if ENV['RAILS_ETD_ENCODING'] and ENV['RAILS_ETD_ENCODING'].match(/^[-:_.A-Z0-9]+$/)
-    system("iconv -f UTF-8 -t #{ENV['RAILS_ETD_ENCODING']} #{filename} > temp.csv")
-    system("mv -f temp.csv #{filename}")
-  end
 end
 
 def generate_csv(submissions, filename = nil)
