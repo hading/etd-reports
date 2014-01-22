@@ -73,7 +73,7 @@ end
 
 def generate_csv(submissions, filename = nil)
   if filename
-    CSV.open(filename, "wb", :encoding => 'UTF-8') do |csv|
+    CSV.open(filename, "wb", :encoding => 'UTF-8', :quote_char => '~') do |csv|
       generate_csv_internal(csv, submissions)
     end
   else
@@ -112,7 +112,10 @@ def generate_csv_internal(csv, submissions)
       else
         value.is_a?(Array) ? value.join('; ') : value
       end
-    end.flatten
+    #The following kludge is brought to you by SQL Server 2008. Since it won't handle embedded quotes in CSV files
+      #we use ~ as the text quoting character and replace any ones that are in the string - which is should be noted
+      #we have none of right now - with the very similar in appearance tilde operator.
+    end.flatten.collect {|str| str.gsub('~', "\u{223c}")}
   end
 end
 
