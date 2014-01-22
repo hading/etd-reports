@@ -70,7 +70,7 @@ namespace :etd do
   desc 'Look for and potentially fix metadata values that may have duplicate'
   #Specifically, we look for any piece of metadata whose text_value has length > 1, contains a space character, and where the first
   #half of the string is exactly the same as the last
-  task :check_metadata_values do
+  task :check_metadata_values => [:environment] do
     metadata_values = MetadataValue.all
     metadata_values.select! {|v| v.text_value.present and v.text_value.length > 1 and v.text_value.include?(' ')}
     metadata_values.select! {|v| possible_duplicate?(v.text_value)}
