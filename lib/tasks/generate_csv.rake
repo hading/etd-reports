@@ -84,10 +84,10 @@ end
 
 def possible_duplicate?(string)
   l = string.length / 2
-  if l.odd?
-    string.slice(0, l) == string.slice(l+1, l)
+  if string.length.odd?
+    return (string.slice(0, l) == string.slice(l+1, l))
   else
-    string.slice(0,l) == string.slice(l,l)
+    return (string.slice(0,l) == string.slice(l,l))
   end
 end
 
