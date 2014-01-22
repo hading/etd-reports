@@ -38,7 +38,7 @@ namespace :etd do
   desc 'generate csv report for last 120 days of approvals and upload to grad college share'
   task :make_and_upload_csv => [:environment, :ensure_dates] do
     end_date = Date.today
-    start_date = end_date - 120.days
+    start_date = end_date - 30.days
     submissions = VireoSubmission.reportable.where(:approval_date => start_date..(end_date + 1.day)).includes(:applicant).includes(:item => :metadata_values)
     filename = "ideals.csv"
     begin
@@ -51,8 +51,6 @@ namespace :etd do
 
   desc 'generate csv report of entire database and upload to grad college share'
   task :make_and_upload_all_csv => [:environment, :ensure_dates] do
-    end_date = Date.today
-    start_date = end_date - 120.days
     submissions = VireoSubmission.reportable.includes(:applicant).includes(:item => :metadata_values)
     filename = "all.csv"
     begin
