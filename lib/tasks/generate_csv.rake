@@ -67,6 +67,28 @@ namespace :etd do
     ENV['RAILS_ETD_CSV_END_DATE'] ||= (Date.today- 1.day).to_s
   end
 
+  desc 'Look for and potentially fix metadata values that may have duplicate'
+  #Specifically, we look for any piece of metadata whose text_value has length > 1, contains a space character, and where the first
+  #half of the string is exactly the same as the last
+  task :check_metadata_values do
+    metadata_values = MetadataValue.all
+    metadata_values.select! {|v| v.text_value.present and v.text_value.length > 1 and v.text_value.include?(' ')}
+    metadata_values.select! {|v| possible_duplicate?(v.text_value)}
+    puts "Possible duplicate count: #{metadata_values.length}"
+    metadata_values.each do |v|
+      puts "#{v.metadata_field.element}:#{v.metadata_field.qualifier}:#{v.text_value}"
+    end
+  end
+
+end
+
+def possible_duplicate?(string)
+  l = string.length / 2
+  if l.odd?
+    string.slice(0, l) == string.slice(l+1, l)
+  else
+    string.slice(0,l) == string.slice(l,l)
+  end
 end
 
 def generate_csv(submissions, filename = nil)
