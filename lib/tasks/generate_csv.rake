@@ -82,6 +82,11 @@ namespace :etd do
 
 end
 
+def fix_duplicate(metadata_value)
+  metadata_value.text_value = metadata_value.text_value.slice(0, metadata_value.text_value.length / 2)
+  metadata_value.save!
+end
+
 def possible_duplicate?(string)
   l = string.length / 2
   if string.length.odd?

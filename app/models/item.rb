@@ -32,7 +32,7 @@ class Item < ActiveRecord::Base
       h[:degree_department] = finder.call('degree', 'department')
       h[:embargo_option] = submission.canonical_embargo_description
       h[:title] = finder.call('title') #.gsub(%q("), %q('))
-      h[:deposit_date] = (submission.submission_date.strftime('%F') rescue "")
+      h[:deposit_date] = (submission.approval_date.strftime('%F') rescue "")
       h[:degree_date] = finder.call('date', 'submitted')
       h[:degree_month], h[:degree_year] = h[:degree_date].split
       h[:program] = finder.call('degree', 'program')
